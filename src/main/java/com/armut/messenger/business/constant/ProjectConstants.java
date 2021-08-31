@@ -1,7 +1,6 @@
 package com.armut.messenger.business.constant;
 
 public class ProjectConstants {
-    //TODO: UUID EKLE.
     public static final long ID_UNSAVED_VALUE = 0L;
     public static final String ID_COLUMN_NAME = "record_id";
     public static final String VERSION_COLUMN_NAME = "version";
