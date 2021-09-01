@@ -13,6 +13,9 @@ public class UserAPIMapper {
         UserAPIResponseDTO userAPIResponseDTO = new UserAPIResponseDTO();
 
         userAPIResponseDTO.setUsername(user.getUsername());
+        userAPIResponseDTO.setToken(user.getToken());
+        userAPIResponseDTO.setTokenExpiryDate(user.getTokenExpiryDate());
+
         return userAPIResponseDTO;
     }
 

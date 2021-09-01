@@ -3,9 +3,8 @@ package com.armut.messenger.business.model;
 import com.armut.messenger.business.constant.ProjectConstants;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -17,5 +16,12 @@ public class User extends AbstractBaseModel {
 
     @Column(name = ProjectConstants.TableConstants.User.PASSWORD, nullable = false)
     private String password;
+
+    @Column(name = ProjectConstants.TableConstants.User.TOKEN)
+    private String token;
+
+    @Column(name = ProjectConstants.TableConstants.User.TOKEN_EXPIRY_DATE)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date tokenExpiryDate;
 
 }

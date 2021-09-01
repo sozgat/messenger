@@ -27,7 +27,7 @@ public class UserAPIController {
     }
 
     @GetMapping
-    public ResponseEntity<APIResponseDTO<List<UserAPIResponseDTO>>> users(){
+    public ResponseEntity<APIResponseDTO<List<UserAPIResponseDTO>>> getUsers(){
 
         List<UserAPIResponseDTO> userAPIResponseDTO = UserAPIMapper.fromDomain(userService.findAll());
 
@@ -43,6 +43,23 @@ public class UserAPIController {
             userService.save(user);
 
             UserAPIResponseDTO userAPIResponseDTO = UserAPIMapper.fromDomain(user);
+
+            APIResponseDTO apiResponse = new APIResponseDTO<>(HttpStatus.OK,userAPIResponseDTO);
+            return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+        }
+        catch (Exception e){
+            throw new RuntimeException("Error error!");
+        }
+    }
+
+    @RequestMapping(value = "/login")
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<APIResponseDTO<UserAPIResponseDTO>> loginUser(@RequestBody UserAPIRequestDTO userAPIRequestDTO){
+        try{
+            User user = UserAPIMapper.toDomain(userAPIRequestDTO);
+            User existUser = userService.existUser(user);
+            userService.setToken(existUser);
+            UserAPIResponseDTO userAPIResponseDTO = UserAPIMapper.fromDomain(existUser);
 
             APIResponseDTO apiResponse = new APIResponseDTO<>(HttpStatus.OK,userAPIResponseDTO);
             return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);

@@ -15,6 +15,8 @@ public class ProjectConstants {
         public class User{
             public static final String USERNAME = "username";
             public static final String PASSWORD = "password";
+            public static final String TOKEN = "token";
+            public static final String TOKEN_EXPIRY_DATE = "token_expiry_date";
         }
 
         public class Message{
@@ -28,4 +30,5 @@ public class ProjectConstants {
             public static final String BLOCKED_USER_ID = "blocked_user_id";
         }
     }
+
 }
