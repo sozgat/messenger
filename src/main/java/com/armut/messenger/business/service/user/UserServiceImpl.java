@@ -7,10 +7,7 @@ import com.armut.messenger.business.service.BaseServiceImpl;
 import com.armut.messenger.business.util.CryptUtil;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -57,20 +54,10 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     @Override
     public void setToken(User user) {
-        // Creating the LocalDatetime object
-        LocalDate currentLocalDate = LocalDate.now().plusDays(30);
 
-        // Getting system timezone
-        ZoneId systemTimeZone = ZoneId.systemDefault();
-
-        // converting LocalDateTime to ZonedDateTime with the system timezone
-        ZonedDateTime zonedDateTime = currentLocalDate.atStartOfDay(systemTimeZone);
-
-        // converting ZonedDateTime to Date using Date.from() and ZonedDateTime.toInstant()
-        Date utilDate = Date.from(zonedDateTime.toInstant());
 
         user.setToken(UUID.randomUUID().toString());
-        user.setTokenExpiryDate(utilDate);
+        user.setTokenExpiryDate(LocalDateTime.now().plusDays(30));
 
         super.save(user);
     }

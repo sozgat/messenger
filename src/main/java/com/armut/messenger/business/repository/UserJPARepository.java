@@ -4,4 +4,5 @@ import com.armut.messenger.business.model.User;
 
 public interface UserJPARepository extends BaseJPARepository<User,Long> {
     User findByUsername(String username);
+    User findByToken(String token);
 }

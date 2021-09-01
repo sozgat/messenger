@@ -1,13 +1,12 @@
 package com.armut.messenger.business.model;
 
 import com.armut.messenger.business.constant.ProjectConstants;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @MappedSuperclass
@@ -27,11 +26,9 @@ public abstract class AbstractBaseModel {
     @Column(name = ProjectConstants.ACTIVE_COLUMN_NAME, nullable = false)
     private boolean active = true;
 
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = ProjectConstants.CREATION_DATE_COLUMN_NAME, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
+    private LocalDateTime creationDate;
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
