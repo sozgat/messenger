@@ -9,20 +9,16 @@ import com.armut.messenger.business.service.user.UserService;
 import com.armut.messenger.presentation.api.dto.APIResponseDTO;
 import com.armut.messenger.presentation.api.dto.message.MessageAPIRequestDTO;
 import com.armut.messenger.presentation.api.dto.message.MessageAPIResponseDTO;
-import com.armut.messenger.presentation.api.dto.user.UserAPIResponseDTO;
 import com.armut.messenger.presentation.api.mapper.MessageAPIMapper;
-import com.armut.messenger.presentation.api.mapper.UserAPIMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -60,6 +56,33 @@ public class MessageAPIController {
                 return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
             }
             throw new RuntimeException("FromUser Token not equal to authorization. You couldn't send message.");
+        }
+        catch (Exception e){
+            throw new RuntimeException("Error error!");
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<APIResponseDTO<List<MessageAPIResponseDTO>>> getMessagesByFromUser(@RequestBody MessageAPIRequestDTO messageAPIRequestDTO,
+                                                                                HttpServletRequest request, HttpServletResponse response){
+
+        try {
+            final String authorization = request.getHeader(SecurityConstants.DEFAULT_HEADER_TOKEN_KEY);
+            User fromUser = userService.getUserByUsername(messageAPIRequestDTO.getFromUsername());
+
+            String[] arrOfStr = authorization.split(" ");
+            String userToken = arrOfStr[1];
+            if (userToken.equals(fromUser.getToken())){
+
+                List<MessageAPIResponseDTO> messageAPIResponseDTO = MessageAPIMapper.fromDomain(messageService.getMessagesByFromUserId(fromUser));
+
+                APIResponseDTO<List<MessageAPIResponseDTO>> apiResponse = new APIResponseDTO<>(HttpStatus.OK,messageAPIResponseDTO);
+
+                return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+            }
+            else{
+                throw new RuntimeException("User Token not equal to authorization. You can't see message.");
+            }
         }
         catch (Exception e){
             throw new RuntimeException("Error error!");

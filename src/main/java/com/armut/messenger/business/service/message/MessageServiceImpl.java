@@ -1,9 +1,12 @@
 package com.armut.messenger.business.service.message;
 
 import com.armut.messenger.business.model.Message;
+import com.armut.messenger.business.model.User;
 import com.armut.messenger.business.repository.MessageJPARepository;
 import com.armut.messenger.business.service.BaseServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MessageServiceImpl extends BaseServiceImpl<Message> implements MessageService {
@@ -13,5 +16,10 @@ public class MessageServiceImpl extends BaseServiceImpl<Message> implements Mess
     public MessageServiceImpl(MessageJPARepository messageJPARepository) {
         super(messageJPARepository);
         this.messageJPARepository = messageJPARepository;
+    }
+
+    @Override
+    public List<Message> getMessagesByFromUserId(User user) {
+       return messageJPARepository.findAllByFromUserId(user);
     }
 }
