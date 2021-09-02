@@ -2,8 +2,10 @@ package com.armut.messenger.business.context.filter;
 
 import com.armut.messenger.business.constant.MappingConstants;
 import com.armut.messenger.business.constant.SecurityConstants;
+import com.armut.messenger.business.exception.APIException;
 import com.armut.messenger.business.model.User;
 import com.armut.messenger.business.repository.UserJPARepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
@@ -52,23 +54,22 @@ public class AuthorizationRequestFilter implements Filter {
                             return;
                         }
                         else{
-                            throw new RuntimeException("Token Expiry");
+                            throw new APIException("Token Expiry", HttpStatus.UNAUTHORIZED);
                         }
                     }
                     else{
-                        throw new RuntimeException("Token Not Found");
+                        throw new APIException("Token Not Found", HttpStatus.UNAUTHORIZED);
                     }
                 }
                 else{
-                    throw new RuntimeException("Invalid Token");
+                    throw new APIException("Invalid Token", HttpStatus.UNAUTHORIZED);
                 }
             } else {
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
             }
         } catch (Exception e) {
-            //TODO: burada login page yönlendirme uyarısı koy
-            return;
+            throw new APIException("GO LOGIN PAGE", HttpStatus.PERMANENT_REDIRECT);
         }
     }
 
