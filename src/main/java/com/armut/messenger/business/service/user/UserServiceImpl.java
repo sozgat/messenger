@@ -58,6 +58,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     }
 
     @Override
+    public User getUserByToken(User user) {
+        return userJPARepository.findByToken(user.getToken());
+    }
+
+    @Override
     public void setToken(User user) {
 
 

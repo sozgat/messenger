@@ -6,6 +6,8 @@ import com.armut.messenger.business.repository.MessageJPARepository;
 import com.armut.messenger.business.service.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,5 +23,15 @@ public class MessageServiceImpl extends BaseServiceImpl<Message> implements Mess
     @Override
     public List<Message> getMessagesByFromUserId(User user) {
        return messageJPARepository.findAllByFromUserId(user);
+    }
+
+    @Override
+    public List<String> getAllMessagingUserList(Long id) {
+        List<Object[]>  allMessagingUserList = messageJPARepository.getAllMessagingUserList(id);
+        List<String> returnList = new ArrayList<>();
+        for (Object[] allMessagingUser : allMessagingUserList) {
+            returnList.add( (String) allMessagingUser[0]);
+        }
+        return returnList;
     }
 }

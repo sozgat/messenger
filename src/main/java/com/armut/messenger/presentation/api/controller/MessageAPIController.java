@@ -1,6 +1,7 @@
 package com.armut.messenger.presentation.api.controller;
 
 import com.armut.messenger.business.constant.MappingConstants;
+import com.armut.messenger.business.constant.ProjectConstants;
 import com.armut.messenger.business.constant.SecurityConstants;
 import com.armut.messenger.business.exception.APIException;
 import com.armut.messenger.business.model.Message;
@@ -9,6 +10,7 @@ import com.armut.messenger.business.service.blacklist.BlackListService;
 import com.armut.messenger.business.service.message.MessageService;
 import com.armut.messenger.business.service.user.UserService;
 import com.armut.messenger.presentation.api.dto.APIResponseDTO;
+import com.armut.messenger.presentation.api.dto.message.MessageAPIGetMessagesRequestDTO;
 import com.armut.messenger.presentation.api.dto.message.MessageAPIRequestDTO;
 import com.armut.messenger.presentation.api.dto.message.MessageAPIResponseDTO;
 import com.armut.messenger.presentation.api.mapper.MessageAPIMapper;
@@ -40,7 +42,7 @@ public class MessageAPIController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<APIResponseDTO<MessageAPIResponseDTO>> sendMessage(@RequestBody MessageAPIRequestDTO messageAPIRequestDTO,
                                                                              HttpServletRequest request, HttpServletResponse response){
-            //TODO: Kullanıcı kendine mesaj gönderebilir mi? Kendini bloklayabilir mi?
+            //TODO: Kullanıcı kendine mesaj gönderebilir mi? Kendini bloklayabilir mi? (Extreme case)
             final String authorization = request.getHeader(SecurityConstants.DEFAULT_HEADER_TOKEN_KEY);
             User fromUser = userService.getUserByUsername(messageAPIRequestDTO.getFromUsername());
             User toUser = userService.getUserByUsername(messageAPIRequestDTO.getToUsername());
@@ -48,10 +50,9 @@ public class MessageAPIController {
             String[] arrOfStr = authorization.split(" ");
             String userToken = arrOfStr[1];
             if (userToken.equals(fromUser.getToken())){
-                Boolean existBlockingUsers = blackListService.existBlockingUserIdAndBlockedUserId(fromUser,toUser);
-                if (!existBlockingUsers){
-                    Boolean existBlockedUsers = blackListService.existBlockingUserIdAndBlockedUserId(toUser,fromUser);
-                    if (!existBlockedUsers){
+                log.info("User " + fromUser.getUsername() + " - ID:" + fromUser.getId() + "is auth. Function: sendMessage");
+                Boolean existBlockingUsers = blackListService.existBlockingUserIdAndBlockedUserId(toUser,fromUser);
+                    if (!existBlockingUsers){
                         Message message = new Message();
                         message.setContent(messageAPIRequestDTO.getYourMessage());
                         message.setFromUserId(fromUser);
@@ -60,15 +61,16 @@ public class MessageAPIController {
 
                         MessageAPIResponseDTO messageAPIResponseDTO = MessageAPIMapper.fromDomain(message);
 
+                        log.info("User " + fromUser.getUsername() + " - ID:" + fromUser.getId() + "sent message. Function: sendMessage: " +
+                                messageAPIResponseDTO);
+
+
                         APIResponseDTO apiResponse = new APIResponseDTO<>(HttpStatus.OK,messageAPIResponseDTO);
+
                         return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
                     }
-                    else{
-                        throw new APIException("You blocked from "+ toUser.getUsername() +". You can't send message.",HttpStatus.FORBIDDEN);
-                    }
-                }
                 else{
-                    throw new APIException("You blocked "+ fromUser.getUsername() +". You can't send message.", HttpStatus.FORBIDDEN);
+                    throw new APIException("You blocked from "+ toUser.getUsername() +". You can't send message.",HttpStatus.FORBIDDEN);
                 }
             }
             else{
@@ -76,27 +78,45 @@ public class MessageAPIController {
             }
     }
 
+    @GetMapping(value = "/getMessagingList")
+    public ResponseEntity<APIResponseDTO<List<String>>> MessagingList(HttpServletRequest request){
+
+        try {
+            final String authorization = request.getHeader(SecurityConstants.DEFAULT_HEADER_TOKEN_KEY);
+            String[] arrOfStr = authorization.split(" ");
+            String userToken = arrOfStr[1];
+
+            User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
+
+            List<String> allMessagingUserList = messageService.getAllMessagingUserList(authUser.getId());
+
+            APIResponseDTO<List<String>> apiResponse = new APIResponseDTO<>(HttpStatus.OK,allMessagingUserList);
+
+            return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+
+        }
+        catch (Exception e){
+            throw new RuntimeException("Error error!");
+        }
+    }
+
+
     @GetMapping
-    public ResponseEntity<APIResponseDTO<List<MessageAPIResponseDTO>>> getMessagesByFromUser(@RequestBody MessageAPIRequestDTO messageAPIRequestDTO,
+    public ResponseEntity<APIResponseDTO<List<MessageAPIResponseDTO>>> getMessagesByFromUser(@RequestBody MessageAPIGetMessagesRequestDTO messageAPIGetMessagesRequestDTO,
                                                                                 HttpServletRequest request, HttpServletResponse response){
 
         try {
             final String authorization = request.getHeader(SecurityConstants.DEFAULT_HEADER_TOKEN_KEY);
-            User fromUser = userService.getUserByUsername(messageAPIRequestDTO.getFromUsername());
+            User toUser = userService.getUserByUsername(messageAPIGetMessagesRequestDTO.getUsername());
+            User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
 
-            String[] arrOfStr = authorization.split(" ");
-            String userToken = arrOfStr[1];
-            if (userToken.equals(fromUser.getToken())){
 
-                List<MessageAPIResponseDTO> messageAPIResponseDTO = MessageAPIMapper.fromDomain(messageService.getMessagesByFromUserId(fromUser));
+            List<MessageAPIResponseDTO> messageAPIResponseDTO = MessageAPIMapper.fromDomain(messageService.getMessagesByFromUserId(toUser));
 
                 APIResponseDTO<List<MessageAPIResponseDTO>> apiResponse = new APIResponseDTO<>(HttpStatus.OK,messageAPIResponseDTO);
 
                 return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
-            }
-            else{
-                throw new RuntimeException("User Token not equal to authorization. You can't see message.");
-            }
+
         }
         catch (Exception e){
             throw new RuntimeException("Error error!");

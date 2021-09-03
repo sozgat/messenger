@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface MessageService extends BaseService<Message> {
     List<Message> getMessagesByFromUserId(User user);
+    List<String> getAllMessagingUserList(Long id);
 }

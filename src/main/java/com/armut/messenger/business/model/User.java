@@ -24,7 +24,4 @@ public class User extends AbstractBaseModel {
 
     @Column(name = ProjectConstants.TableConstants.User.TOKEN_EXPIRY_DATE)
     private LocalDateTime tokenExpiryDate;
-
-    //TODO: UUID üzerinden userler mesajlaşabilir.
-
 }

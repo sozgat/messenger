@@ -1,6 +1,7 @@
 package com.armut.messenger.business.context.filter;
 
 import com.armut.messenger.business.constant.MappingConstants;
+import com.armut.messenger.business.constant.ProjectConstants;
 import com.armut.messenger.business.constant.SecurityConstants;
 import com.armut.messenger.business.exception.APIException;
 import com.armut.messenger.business.model.User;
@@ -50,6 +51,7 @@ public class AuthorizationRequestFilter implements Filter {
                     User user = userJPARepository.findByToken(userToken);
                     if (!user.getToken().isEmpty()){
                         if (user.getTokenExpiryDate().isAfter(LocalDateTime.now())){
+                            httpServletRequest.setAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER,user);
                             filterChain.doFilter(servletRequest, servletResponse);
                             return;
                         }
