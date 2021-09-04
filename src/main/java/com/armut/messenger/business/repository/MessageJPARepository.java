@@ -17,4 +17,10 @@ public interface MessageJPARepository extends BaseJPARepository<Message,Long> {
     List<Object[]> getAllMessagingUserList(Long id);
     //TODO: fonksiyon adı değiştir
 
+    @Query(value = "SELECT * FROM ( " +
+            "SELECT from_user_id, to_user_id, content, creation_date FROM message WHERE from_user_id=?1 AND to_user_id=?2 " +
+            "UNION " +
+            "SELECT from_user_id, to_user_id, content, creation_date FROM message WHERE from_user_id=?2 AND to_user_id=?1) t " +
+            "order by t.creation_date", nativeQuery = true)
+    List<Object[]> getAllMessagesBetweenTwoUser(Long fromUserId, Long toUserId);
 }

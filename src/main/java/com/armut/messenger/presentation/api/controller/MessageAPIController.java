@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -78,7 +79,7 @@ public class MessageAPIController {
             }
     }
 
-    @GetMapping(value = "/getMessagingList")
+    @GetMapping(value = "/messagingList")
     public ResponseEntity<APIResponseDTO<List<String>>> MessagingList(HttpServletRequest request){
 
         try {
@@ -101,25 +102,23 @@ public class MessageAPIController {
     }
 
 
-    @GetMapping
-    public ResponseEntity<APIResponseDTO<List<MessageAPIResponseDTO>>> getMessagesByFromUser(@RequestBody MessageAPIGetMessagesRequestDTO messageAPIGetMessagesRequestDTO,
-                                                                                HttpServletRequest request, HttpServletResponse response){
-
+    @PostMapping(value = "/myMessages")
+    public ResponseEntity<APIResponseDTO<List<MessageAPIResponseDTO>>> getMessagesByFromUser(@Valid @RequestBody MessageAPIGetMessagesRequestDTO messageAPIGetMessagesRequestDTO,
+                                                                                HttpServletRequest request){
         try {
-            final String authorization = request.getHeader(SecurityConstants.DEFAULT_HEADER_TOKEN_KEY);
             User toUser = userService.getUserByUsername(messageAPIGetMessagesRequestDTO.getUsername());
             User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
 
+            List<Message> allMessages = messageService.getAllMessagingBetweenTwoUser(authUser.getId(),toUser.getId());
 
-            List<MessageAPIResponseDTO> messageAPIResponseDTO = MessageAPIMapper.fromDomain(messageService.getMessagesByFromUserId(toUser));
+            List<MessageAPIResponseDTO> messageAPIResponseDTO = MessageAPIMapper.fromDomain(allMessages);
 
-                APIResponseDTO<List<MessageAPIResponseDTO>> apiResponse = new APIResponseDTO<>(HttpStatus.OK,messageAPIResponseDTO);
+            APIResponseDTO<List<MessageAPIResponseDTO>> apiResponse = new APIResponseDTO<>(HttpStatus.OK,messageAPIResponseDTO);
 
-                return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
-
+            return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
         }
         catch (Exception e){
-            throw new RuntimeException("Error error!");
+            throw new RuntimeException(e.getMessage());
         }
     }
 
