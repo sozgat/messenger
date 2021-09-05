@@ -6,6 +6,7 @@ import com.armut.messenger.business.constant.SecurityConstants;
 import com.armut.messenger.business.exception.APIException;
 import com.armut.messenger.business.model.User;
 import com.armut.messenger.business.repository.UserJPARepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-
+@Slf4j
 @Component
 public class AuthorizationRequestFilter implements Filter {
 
@@ -56,22 +57,22 @@ public class AuthorizationRequestFilter implements Filter {
                             return;
                         }
                         else{
-                            throw new APIException("Token Expiry", HttpStatus.UNAUTHORIZED);
+                            throw new APIException("Token Expiry", HttpStatus.UNAUTHORIZED, user);
                         }
                     }
                     else{
-                        throw new APIException("Token Not Found", HttpStatus.UNAUTHORIZED);
+                        throw new APIException("Token Not Found", HttpStatus.UNAUTHORIZED, authorization);
                     }
                 }
                 else{
-                    throw new APIException("Invalid Token", HttpStatus.UNAUTHORIZED);
+                    throw new APIException("Invalid Token", HttpStatus.UNAUTHORIZED, authorization);
                 }
             } else {
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
             }
         } catch (Exception e) {
-            throw new APIException("GO LOGIN PAGE", HttpStatus.PERMANENT_REDIRECT);
+            throw new APIException("GO LOGIN PAGE", HttpStatus.PERMANENT_REDIRECT,"");
         }
     }
 

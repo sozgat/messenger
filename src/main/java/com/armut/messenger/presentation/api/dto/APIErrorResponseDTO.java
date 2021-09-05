@@ -6,8 +6,8 @@ public class APIErrorResponseDTO <T>extends AbstractAPIResponseDTO {
 
     private T error;
 
-    public APIErrorResponseDTO(HttpStatus httpStatus, T error) {
-        super(httpStatus);
+    public APIErrorResponseDTO(String status,HttpStatus httpStatus, T error) {
+        super(status, httpStatus);
         this.error = error;
     }
 

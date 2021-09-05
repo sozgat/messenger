@@ -1,6 +1,7 @@
 package com.armut.messenger.presentation.api.controller;
 
 import com.armut.messenger.business.constant.MappingConstants;
+import com.armut.messenger.business.constant.ProjectConstants;
 import com.armut.messenger.business.model.User;
 import com.armut.messenger.business.service.user.UserService;
 import com.armut.messenger.presentation.api.dto.APIResponseDTO;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -27,45 +29,53 @@ public class UserAPIController {
     }
 
     @GetMapping
-    public ResponseEntity<APIResponseDTO<List<UserAPIResponseDTO>>> getUsers(){
+    public ResponseEntity<APIResponseDTO<List<UserAPIResponseDTO>>> getUsers() throws Exception {
+
+        log.info("getUsers Controller is calling.");
 
         List<UserAPIResponseDTO> userAPIResponseDTO = UserAPIMapper.fromDomain(userService.findAll());
 
-        APIResponseDTO<List<UserAPIResponseDTO>> apiResponse = new APIResponseDTO<>(HttpStatus.OK,userAPIResponseDTO);
+        APIResponseDTO<List<UserAPIResponseDTO>> apiResponse = new APIResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_SUCCESS, HttpStatus.OK, userAPIResponseDTO);
 
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+        log.info("getUsers Controller is ending.");
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<APIResponseDTO<UserAPIResponseDTO>> createUser(@RequestBody UserAPIRequestDTO userAPIRequestDTO){
-        try{
-            User user = UserAPIMapper.toDomain(userAPIRequestDTO);
-            userService.save(user);
+    public ResponseEntity<APIResponseDTO<UserAPIResponseDTO>> createUser(@Valid @RequestBody UserAPIRequestDTO userAPIRequestDTO) throws Exception {
 
-            UserAPIResponseDTO userAPIResponseDTO = UserAPIMapper.fromDomain(user);
+        log.info("createUser Controller is calling.");
 
-            APIResponseDTO apiResponse = new APIResponseDTO<>(HttpStatus.OK,userAPIResponseDTO);
-            return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
-        }
-        catch (Exception e){
-            throw new RuntimeException("Error error!");
-        }
+        User user = UserAPIMapper.toDomain(userAPIRequestDTO);
+        userService.save(user);
+
+        log.info("createUser: Data is saved to User succesfully. UserID: " + user.getId());
+
+        UserAPIResponseDTO userAPIResponseDTO = UserAPIMapper.fromDomain(user);
+
+        APIResponseDTO apiResponse = new APIResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_SUCCESS, HttpStatus.OK, userAPIResponseDTO);
+
+        log.info("createUser Controller is ending.");
+        return ResponseEntity.status(apiResponse.getHttpStatus()).body(apiResponse);
     }
 
     @RequestMapping(value = "/login")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<APIResponseDTO<UserAPIResponseDTO>> loginUser(@RequestBody UserAPIRequestDTO userAPIRequestDTO){
-        try{
-            User user = UserAPIMapper.toDomain(userAPIRequestDTO);
-            User existUser = userService.existUser(user);
-            userService.setToken(existUser);
-            UserAPIResponseDTO userAPIResponseDTO = UserAPIMapper.fromDomain(existUser);
+    public ResponseEntity<APIResponseDTO<UserAPIResponseDTO>> loginUser(@Valid @RequestBody UserAPIRequestDTO userAPIRequestDTO) throws Exception {
 
-            APIResponseDTO apiResponse = new APIResponseDTO<>(HttpStatus.OK,userAPIResponseDTO);
-            return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
-        }
-        catch (Exception e){
-            throw new RuntimeException("Error error!");
-        }
+        log.info("loginUser Controller is calling.");
+
+        User user = UserAPIMapper.toDomain(userAPIRequestDTO);
+        User existUser = userService.existUser(user);
+        userService.setToken(existUser);
+
+        log.info("loginUser: User is logging succesfully. UserID: " + existUser.getId());
+
+        UserAPIResponseDTO userAPIResponseDTO = UserAPIMapper.fromDomain(existUser);
+
+        APIResponseDTO apiResponse = new APIResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_SUCCESS, HttpStatus.OK, userAPIResponseDTO);
+
+        log.info("loginUser Controller is ending.");
+        return ResponseEntity.status(apiResponse.getHttpStatus()).body(apiResponse);
     }
 }

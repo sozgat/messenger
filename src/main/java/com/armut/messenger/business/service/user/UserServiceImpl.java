@@ -5,11 +5,14 @@ import com.armut.messenger.business.model.User;
 import com.armut.messenger.business.repository.UserJPARepository;
 import com.armut.messenger.business.service.BaseServiceImpl;
 import com.armut.messenger.business.util.CryptUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User> implements UserService {
 
@@ -33,22 +36,16 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     @Override
     public User existUser(User user) {
-        if (user.getUsername().isEmpty() || user.getPassword().isEmpty()){
-            throw new RuntimeException("Username or Password False!");
-        }
-        else{
-                User existUser = userJPARepository.findByUsername(user.getUsername());
-            if (!existUser.getUsername().isEmpty()) {
-                if (existUser.getPassword().equals(CryptUtil.encrypt(user.getPassword()))){
-                    return existUser;
-                }
-                else{
-                    throw new RuntimeException("Password is incorrect!");
-                }
+
+        User existUser = userJPARepository.findByUsername(user.getUsername());
+        if (!Objects.isNull(existUser)) {
+            if (existUser.getPassword().equals(CryptUtil.encrypt(user.getPassword()))) {
+                return existUser;
+            } else {
+                throw new RuntimeException("Invalid Login: Password is incorrect! \n Username: " + user.getUsername());
             }
-            else{
-                throw new RuntimeException("Username Not Found!");
-            }
+        } else {
+            throw new RuntimeException("Invalid Login: Username Not Found! \n Username: " + user.getUsername());
         }
     }
 

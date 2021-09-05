@@ -6,8 +6,8 @@ public class APIResponseDTO <T>extends AbstractAPIResponseDTO {
 
     private T data;
 
-    public APIResponseDTO(HttpStatus httpStatus, T data) {
-        super(httpStatus);
+    public APIResponseDTO(String status,HttpStatus httpStatus, T data) {
+        super(status,httpStatus);
         this.data = data;
     }
 

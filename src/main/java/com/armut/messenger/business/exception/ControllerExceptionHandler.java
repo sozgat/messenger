@@ -1,7 +1,9 @@
 package com.armut.messenger.business.exception;
 
+import com.armut.messenger.business.constant.ProjectConstants;
+import com.armut.messenger.business.model.User;
 import com.armut.messenger.presentation.api.dto.APIErrorResponseDTO;
-import com.armut.messenger.presentation.api.dto.APIResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,25 +16,36 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+@Slf4j
 @ControllerAdvice
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     //TODO: ex.getMessage() ile gelen hatayı mutlaka logla. Aşağıdaki metotta hatayı kullanıcıya gösterme.
-    @ExceptionHandler(value = { Throwable.class, Exception.class })
+    @ExceptionHandler(value = {Throwable.class, Exception.class})
     protected ResponseEntity<Object> throwable(
             Exception ex, WebRequest request) {
-        APIErrorResponseDTO apiErrorResponse = new APIErrorResponseDTO<>(HttpStatus.BAD_GATEWAY,ex.getMessage());
-        return handleExceptionInternal(ex, apiErrorResponse,
-                new HttpHeaders(), HttpStatus.BAD_GATEWAY, request);
+        APIErrorResponseDTO apiErrorResponse = new APIErrorResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_ERROR,
+                HttpStatus.BAD_GATEWAY, "Something went wrong!");
+        log.error(ex.getMessage());
+        return handleExceptionInternal(ex, apiErrorResponse, new HttpHeaders(), HttpStatus.BAD_GATEWAY, request);
     }
 
-    @ExceptionHandler(value = { APIException.class })
+    @ExceptionHandler(value = {APIException.class})
     protected ResponseEntity<Object> handleConflict(
             APIException ex, WebRequest request) {
-        APIErrorResponseDTO apiErrorResponse = new APIErrorResponseDTO<>(ex.getHttpStatus(),ex.getMessage());
-        return handleExceptionInternal(ex, apiErrorResponse,
-                new HttpHeaders(), ex.getHttpStatus(), request);
+        APIErrorResponseDTO apiErrorResponse = new APIErrorResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_ERROR,
+                ex.getHttpStatus(), ex.getMessage());
+
+        User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER,0);
+        if (Objects.isNull(authUser)){
+            log.error(ex.getMessage() +"\n Request Data: " + ex.getRequestData());
+        }
+        else{
+            log.error(ex.getMessage() + " - Auth UserID: " + authUser.getId() +"\n Request Data: " + ex.getRequestData());
+        }
+        return handleExceptionInternal(ex, apiErrorResponse, new HttpHeaders(), ex.getHttpStatus(), request);
     }
 
     @Override
@@ -40,8 +53,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers, HttpStatus status, WebRequest request) {
 
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) ->{
-
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String message = error.getDefaultMessage();
             errors.put(fieldName, message);
@@ -49,8 +61,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
         //return new ResponseEntity<Object>(errors, HttpStatus.BAD_REQUEST);
         //TODO: LOG yazılacak, log ile gerçek hatayı bastır.
-        return handleExceptionInternal(ex, "REQUEST FORMAT INVALID",
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        APIErrorResponseDTO apiErrorResponse = new APIErrorResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_ERROR,
+                HttpStatus.BAD_REQUEST, errors);
+
+        return handleExceptionInternal(ex, apiErrorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 
     }
 

@@ -8,6 +8,10 @@ public class ProjectConstants {
     public static final String CREATION_DATE_COLUMN_NAME = "creation_date";
     public static final String HEADER_ATTRIBUTE_AUTH_USER ="authUser";
 
+    public static final String API_RESPONSE_STATUS_SUCCESS = "success";
+    public static final String API_RESPONSE_STATUS_ERROR = "error";
+
+
     public class TableConstants {
         public static final String USER_TABLE_NAME = "USER";
         public static final String MESSAGE_TABLE_NAME = "MESSAGE";

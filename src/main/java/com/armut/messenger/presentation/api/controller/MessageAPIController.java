@@ -2,7 +2,6 @@ package com.armut.messenger.presentation.api.controller;
 
 import com.armut.messenger.business.constant.MappingConstants;
 import com.armut.messenger.business.constant.ProjectConstants;
-import com.armut.messenger.business.constant.SecurityConstants;
 import com.armut.messenger.business.exception.APIException;
 import com.armut.messenger.business.model.Message;
 import com.armut.messenger.business.model.User;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -41,85 +39,72 @@ public class MessageAPIController {
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<APIResponseDTO<MessageAPIResponseDTO>> sendMessage(@RequestBody MessageAPIRequestDTO messageAPIRequestDTO,
-                                                                             HttpServletRequest request, HttpServletResponse response){
-            //TODO: Kullanıcı kendine mesaj gönderebilir mi? Kendini bloklayabilir mi? (Extreme case)
-            final String authorization = request.getHeader(SecurityConstants.DEFAULT_HEADER_TOKEN_KEY);
-            User fromUser = userService.getUserByUsername(messageAPIRequestDTO.getFromUsername());
-            User toUser = userService.getUserByUsername(messageAPIRequestDTO.getToUsername());
+    public ResponseEntity<APIResponseDTO<MessageAPIResponseDTO>> sendMessage(@Valid @RequestBody MessageAPIRequestDTO messageAPIRequestDTO,
+                                                                             HttpServletRequest request) throws Exception {
+        //TODO: Kullanıcı kendine mesaj gönderebilir mi? Kendini bloklayabilir mi? (Extreme case)
+        User authFromUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
+        User toUser = userService.getUserByUsername(messageAPIRequestDTO.getToUsername());
 
-            String[] arrOfStr = authorization.split(" ");
-            String userToken = arrOfStr[1];
-            if (userToken.equals(fromUser.getToken())){
-                log.info("User " + fromUser.getUsername() + " - ID:" + fromUser.getId() + "is auth. Function: sendMessage");
-                Boolean existBlockingUsers = blackListService.existBlockingUserIdAndBlockedUserId(toUser,fromUser);
-                    if (!existBlockingUsers){
-                        Message message = new Message();
-                        message.setContent(messageAPIRequestDTO.getYourMessage());
-                        message.setFromUserId(fromUser);
-                        message.setToUserId(toUser);
-                        messageService.save(message);
+        log.info("sendMessage Controller is calling - Auth UserID: " + authFromUser.getId());
 
-                        MessageAPIResponseDTO messageAPIResponseDTO = MessageAPIMapper.fromDomain(message);
+        Boolean existBlockingUsers = blackListService.existBlockingUserIdAndBlockedUserId(toUser, authFromUser);
+        if (!existBlockingUsers) {
+            Message message = new Message();
+            message.setContent(messageAPIRequestDTO.getYourMessage());
+            message.setFromUserId(authFromUser);
+            message.setToUserId(toUser);
+            messageService.save(message);
 
-                        log.info("User " + fromUser.getUsername() + " - ID:" + fromUser.getId() + "sent message. Function: sendMessage: " +
-                                messageAPIResponseDTO);
+            MessageAPIResponseDTO messageAPIResponseDTO = MessageAPIMapper.fromDomain(message);
 
+            log.info("sendMessage: User " + authFromUser.getUsername() + " - ID: " + authFromUser.getId() + " sent message. Function: sendMessage: " +
+                    messageAPIResponseDTO);
 
-                        APIResponseDTO apiResponse = new APIResponseDTO<>(HttpStatus.OK,messageAPIResponseDTO);
+            APIResponseDTO apiResponse = new APIResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_SUCCESS, HttpStatus.OK, messageAPIResponseDTO);
 
-                        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
-                    }
-                else{
-                    throw new APIException("You blocked from "+ toUser.getUsername() +". You can't send message.",HttpStatus.FORBIDDEN);
-                }
-            }
-            else{
-                throw new APIException("FromUser Token not equal to authorization. You can't send message.", HttpStatus.UNAUTHORIZED );
-            }
-    }
-
-    @GetMapping(value = "/messagingList")
-    public ResponseEntity<APIResponseDTO<List<String>>> MessagingList(HttpServletRequest request){
-
-        try {
-            final String authorization = request.getHeader(SecurityConstants.DEFAULT_HEADER_TOKEN_KEY);
-            String[] arrOfStr = authorization.split(" ");
-            String userToken = arrOfStr[1];
-
-            User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
-
-            List<String> allMessagingUserList = messageService.getAllMessagingUserList(authUser.getId());
-
-            APIResponseDTO<List<String>> apiResponse = new APIResponseDTO<>(HttpStatus.OK,allMessagingUserList);
-
-            return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
-
-        }
-        catch (Exception e){
-            throw new RuntimeException("Error error!");
+            log.info("sendMessage Controller is ending - Auth UserID: " + authFromUser.getId());
+            return ResponseEntity.status(apiResponse.getHttpStatus()).body(apiResponse);
+        } else {
+            throw new APIException("You blocked from "+ toUser.getUsername() +". You can't send message.", HttpStatus.FORBIDDEN, messageAPIRequestDTO);
         }
     }
 
+    @GetMapping(value = "/userlist")
+    public ResponseEntity<APIResponseDTO<List<String>>> messagingUserList(HttpServletRequest request) throws Exception {
 
-    @PostMapping(value = "/myMessages")
+        User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
+        log.info("messagingUserList Controller is calling - Auth UserID: " + authUser.getId());
+
+        List<String> allMessagingUserList = messageService.getAllMessagingUserList(authUser.getId());
+
+        log.info("messagingUserList: Auth UserID: " + authUser.getId() + " - Response Data: " + allMessagingUserList);
+
+        APIResponseDTO<List<String>> apiResponse = new APIResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_SUCCESS, HttpStatus.OK, allMessagingUserList);
+
+        log.info("messagingUserList Controller is ending - Auth UserID: " + authUser.getId());
+        return ResponseEntity.status(apiResponse.getHttpStatus()).body(apiResponse);
+    }
+
+
+    @PostMapping(value = "/mymessages")
     public ResponseEntity<APIResponseDTO<List<MessageAPIResponseDTO>>> getMessagesByFromUser(@Valid @RequestBody MessageAPIGetMessagesRequestDTO messageAPIGetMessagesRequestDTO,
-                                                                                HttpServletRequest request){
-        try {
-            User toUser = userService.getUserByUsername(messageAPIGetMessagesRequestDTO.getUsername());
-            User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
+                                                                                             HttpServletRequest request) throws Exception {
 
-            List<Message> allMessages = messageService.getAllMessagingBetweenTwoUser(authUser.getId(),toUser.getId());
+        User toUser = userService.getUserByUsername(messageAPIGetMessagesRequestDTO.getUsername());
+        User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
+        log.info("getMessagesByFromUser Controller is calling - Auth UserID: " + authUser.getId());
 
-            List<MessageAPIResponseDTO> messageAPIResponseDTO = MessageAPIMapper.fromDomain(allMessages);
+        List<Message> allMessages = messageService.getAllMessagingBetweenTwoUser(authUser.getId(), toUser.getId());
 
-            APIResponseDTO<List<MessageAPIResponseDTO>> apiResponse = new APIResponseDTO<>(HttpStatus.OK,messageAPIResponseDTO);
+        List<MessageAPIResponseDTO> messageAPIResponseDTO = MessageAPIMapper.fromDomain(allMessages);
 
-            return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
-        }
-        catch (Exception e){
-            throw new RuntimeException(e.getMessage());
-        }
+        log.info("getMessagesByFromUser: Auth UserID: " + authUser.getId() + " - Response Data: " + messageAPIResponseDTO);
+
+        APIResponseDTO<List<MessageAPIResponseDTO>> apiResponse = new APIResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_SUCCESS, HttpStatus.OK, messageAPIResponseDTO);
+
+        log.info("getMessagesByFromUser Controller is ending - Auth UserID: " + authUser.getId());
+        return ResponseEntity.status(apiResponse.getHttpStatus()).body(apiResponse);
+
     }
 
 }
