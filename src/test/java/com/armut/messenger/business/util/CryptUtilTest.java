@@ -3,8 +3,6 @@ package com.armut.messenger.business.util;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class CryptUtilTest {
 
     @Test

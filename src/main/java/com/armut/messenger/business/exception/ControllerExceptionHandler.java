@@ -62,17 +62,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.BAD_REQUEST, errors);
 
         User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER,0);
-        //TODO: Request Data koyulabilir.
-
         if (Objects.isNull(authUser)){
-            log.error("Validation ERROR: " + ex.getMessage() +"\n Request Data: " + "");
+            log.error("Validation ERROR: " + ex.getMessage());
         }
         else{
-            log.error("Validation ERROR: " + ex.getMessage() + " - Auth UserID: " + authUser.getId() +"\n Request Data: " + "");
+            log.error("Validation ERROR: " + ex.getMessage() + " - Auth UserID: " + authUser.getId());
         }
-
         return handleExceptionInternal(ex, apiErrorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-
     }
 
 }

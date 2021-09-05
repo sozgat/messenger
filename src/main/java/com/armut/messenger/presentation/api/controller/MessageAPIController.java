@@ -40,8 +40,7 @@ public class MessageAPIController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<APIResponseDTO<MessageAPIResponseDTO>> sendMessage(@Valid @RequestBody MessageAPIRequestDTO messageAPIRequestDTO,
-                                                                             HttpServletRequest request) throws Exception {
-        //TODO: Kullanıcı kendine mesaj gönderebilir mi? Kendini bloklayabilir mi? (Extreme case)
+                                                                             HttpServletRequest request){
         User authFromUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
         User toUser = userService.getUserByUsername(messageAPIRequestDTO.getToUsername());
 
