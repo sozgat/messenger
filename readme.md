@@ -160,8 +160,8 @@ Authorization:Bearer 9fb0177b-ed3f-41d9-902e-38dc8afe35cb
 
 ```js        
 {
-	"toUsername":"said",
-	"yourMessage":"hi said, i'm armut :)"
+	"username":"said",
+	"message":"hi said, i'm armut :)"
 }
 ```
 
