@@ -9,23 +9,6 @@
 			"name": "User",
 			"item": [
 				{
-					"name": "Get Users",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/user",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"user"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Signup User",
 					"request": {
 						"method": "POST",
@@ -46,6 +29,23 @@
 								}
 							}
 						},
+						"url": {
+							"raw": "{{baseUrl}}/user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users",
+					"request": {
+						"method": "GET",
+						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/user",
 							"host": [
@@ -142,6 +142,41 @@
 					"response": []
 				},
 				{
+					"name": "Get Messaging Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "de21accc-8b09-48c8-8bc9-673438ce5b2f",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/message/userlist",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"userlist"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Messages Between Two Users",
 					"request": {
 						"auth": {
@@ -180,41 +215,6 @@
 							"path": [
 								"message",
 								"mymessages"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Messaging Users",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "de21accc-8b09-48c8-8bc9-673438ce5b2f",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/message/userlist",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"message",
-								"userlist"
 							]
 						}
 					},
@@ -297,7 +297,7 @@
 	],
 	"variable": [
 		{
-			"id": "d4be74e9-3ec5-4764-89a1-bae1df105697",
+			"id": "e22d2aaa-b698-48ac-b18c-1e0bdbe26730",
 			"key": "baseUrl",
 			"value": "http://localhost:8080/api/v1",
 			"type": "string"
