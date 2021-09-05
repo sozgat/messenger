@@ -6,7 +6,6 @@ import com.armut.messenger.presentation.api.dto.message.MessageAPIResponseDTO;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// @Component
 public class MessageAPIMapper {
 
     public static MessageAPIResponseDTO fromDomain(Message message){
@@ -23,16 +22,4 @@ public class MessageAPIMapper {
     public static List<MessageAPIResponseDTO> fromDomain(List<Message> messages){
         return messages.stream().map(m -> MessageAPIMapper.fromDomain(m)).collect(Collectors.toList());
     }
-
-   /* public static Message toDomain(MessageAPIRequestDTO messageAPIRequestDTO){
-        Message message = new Message();
-
-
-        message.setFromUserId(messageAPIRequestDTO.getFromUsername());
-        message.setToUserId(messageAPIRequestDTO.getToUsername());
-        message.setContent(messageAPIRequestDTO.getYourMessage());
-
-        return message;
-    } */
-
 }

@@ -16,9 +16,4 @@ public class BlackListAPIMapper {
 
         return blackListAPIResponseDTO;
     }
-
-    public static List<BlackListAPIResponseDTO> fromDomain(List<BlackList> messages){
-        return messages.stream().map(m -> BlackListAPIMapper.fromDomain(m)).collect(Collectors.toList());
-    }
-
 }
