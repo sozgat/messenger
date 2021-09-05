@@ -13,11 +13,11 @@ import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -42,7 +42,6 @@ public class AuthorizationRequestFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         try {
             if (shouldFilter(httpServletRequest)) {
                 final String authorization = httpServletRequest.getHeader(SecurityConstants.DEFAULT_HEADER_TOKEN_KEY);
@@ -50,7 +49,7 @@ public class AuthorizationRequestFilter implements Filter {
                     String[] arrOfStr = authorization.split(" ");
                     String userToken = arrOfStr[1];
                     User user = userJPARepository.findByToken(userToken);
-                    if (!user.getToken().isEmpty()){
+                    if (!Objects.isNull(user) && !user.getToken().isEmpty()){
                         if (user.getTokenExpiryDate().isAfter(LocalDateTime.now())){
                             httpServletRequest.setAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER,user);
                             filterChain.doFilter(servletRequest, servletResponse);
