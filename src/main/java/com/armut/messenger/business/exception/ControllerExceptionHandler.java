@@ -22,7 +22,6 @@ import java.util.Objects;
 @ControllerAdvice
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
-    //TODO: ex.getMessage() ile gelen hatayı mutlaka logla. Aşağıdaki metotta hatayı kullanıcıya gösterme.
     @ExceptionHandler(value = {Throwable.class, Exception.class})
     protected ResponseEntity<Object> throwable(
             Exception ex, WebRequest request) {
@@ -59,10 +58,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
             errors.put(fieldName, message);
         });
 
-        //return new ResponseEntity<Object>(errors, HttpStatus.BAD_REQUEST);
-        //TODO: LOG yazılacak, log ile gerçek hatayı bastır.
         APIErrorResponseDTO apiErrorResponse = new APIErrorResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_ERROR,
                 HttpStatus.BAD_REQUEST, errors);
+
+        User authUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER,0);
+        //TODO: Request Data koyulabilir.
+
+        if (Objects.isNull(authUser)){
+            log.error("Validation ERROR: " + ex.getMessage() +"\n Request Data: " + "");
+        }
+        else{
+            log.error("Validation ERROR: " + ex.getMessage() + " - Auth UserID: " + authUser.getId() +"\n Request Data: " + "");
+        }
 
         return handleExceptionInternal(ex, apiErrorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 

@@ -15,7 +15,6 @@ public interface MessageJPARepository extends BaseJPARepository<Message,Long> {
             "SELECT to_user_id AS from_user_id, from_user_id AS to_user_id FROM message GROUP BY from_user_id,to_user_id " +
             "HAVING to_user_id=?1) t WHERE u.record_id=t.to_user_id", nativeQuery = true)
     List<Object[]> getAllMessagingUserList(Long id);
-    //TODO: fonksiyon adı değiştir
 
     @Query(value = "SELECT * FROM ( " +
             "SELECT from_user_id, to_user_id, content, creation_date FROM message WHERE from_user_id=?1 AND to_user_id=?2 " +
