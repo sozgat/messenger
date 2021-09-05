@@ -26,7 +26,7 @@
 					"response": []
 				},
 				{
-					"name": "Create User",
+					"name": "Signup User",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -297,7 +297,7 @@
 	],
 	"variable": [
 		{
-			"id": "e5376b89-8a0c-4e4a-b7aa-aa1e078d3078",
+			"id": "d4be74e9-3ec5-4764-89a1-bae1df105697",
 			"key": "baseUrl",
 			"value": "http://localhost:8080/api/v1",
 			"type": "string"

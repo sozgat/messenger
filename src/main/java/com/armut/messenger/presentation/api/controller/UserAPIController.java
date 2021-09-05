@@ -42,20 +42,20 @@ public class UserAPIController {
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<APIResponseDTO<UserAPIResponseDTO>> createUser(@Valid @RequestBody UserAPIRequestDTO userAPIRequestDTO) throws Exception {
+    public ResponseEntity<APIResponseDTO<UserAPIResponseDTO>> signupUser(@Valid @RequestBody UserAPIRequestDTO userAPIRequestDTO) throws Exception {
 
-        log.info("createUser Controller is calling.");
+        log.info("signupUser Controller is calling.");
 
         User user = UserAPIMapper.toDomain(userAPIRequestDTO);
         userService.save(user);
 
-        log.info("createUser: Data is saved to User succesfully. UserID: " + user.getId());
+        log.info("signupUser: Data is saved to User succesfully. UserID: " + user.getId());
 
         UserAPIResponseDTO userAPIResponseDTO = UserAPIMapper.fromDomain(user);
 
         APIResponseDTO apiResponse = new APIResponseDTO<>(ProjectConstants.API_RESPONSE_STATUS_SUCCESS, HttpStatus.OK, userAPIResponseDTO);
 
-        log.info("createUser Controller is ending.");
+        log.info("signupUser Controller is ending.");
         return ResponseEntity.status(apiResponse.getHttpStatus()).body(apiResponse);
     }
 
