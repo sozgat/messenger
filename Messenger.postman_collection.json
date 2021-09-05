@@ -106,7 +106,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "b2256d4c-b27e-4990-a63f-9f7bf145b4c9",
+									"value": "9fb0177b-ed3f-41d9-902e-38dc8afe35cb",
 									"type": "string"
 								}
 							]
@@ -122,7 +122,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"toUsername\":\"said\",\n\t\"yourMessage\":\"hi said, i'm armut :)\"\n}",
+							"raw": "{\n\t\"username\":\"said\",\n\t\"message\":\"hi said, i'm armut :)\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -149,7 +149,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "de21accc-8b09-48c8-8bc9-673438ce5b2f",
+									"value": "9fb0177b-ed3f-41d9-902e-38dc8afe35cb",
 									"type": "string"
 								}
 							]
@@ -184,7 +184,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "b2256d4c-b27e-4990-a63f-9f7bf145b4c9",
+									"value": "9fb0177b-ed3f-41d9-902e-38dc8afe35cb",
 									"type": "string"
 								}
 							]
@@ -234,7 +234,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "99e167e2-3ea7-4164-acd6-f55b9f9fe89b",
+									"value": "9fb0177b-ed3f-41d9-902e-38dc8afe35cb",
 									"type": "string"
 								}
 							]
@@ -297,7 +297,7 @@
 	],
 	"variable": [
 		{
-			"id": "e22d2aaa-b698-48ac-b18c-1e0bdbe26730",
+			"id": "6d3d5bd6-aa92-4301-9dec-dce23c27c102",
 			"key": "baseUrl",
 			"value": "http://localhost:8080/api/v1",
 			"type": "string"
