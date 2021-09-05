@@ -42,14 +42,14 @@ public class MessageAPIController {
     public ResponseEntity<APIResponseDTO<MessageAPIResponseDTO>> sendMessage(@Valid @RequestBody MessageAPIRequestDTO messageAPIRequestDTO,
                                                                              HttpServletRequest request){
         User authFromUser = (User) request.getAttribute(ProjectConstants.HEADER_ATTRIBUTE_AUTH_USER);
-        User toUser = userService.getUserByUsername(messageAPIRequestDTO.getToUsername());
+        User toUser = userService.getUserByUsername(messageAPIRequestDTO.getUsername());
 
         log.info("sendMessage Controller is calling - Auth UserID: " + authFromUser.getId());
 
         Boolean existBlockingUsers = blackListService.existBlockingUserIdAndBlockedUserId(toUser, authFromUser);
         if (!existBlockingUsers) {
             Message message = new Message();
-            message.setContent(messageAPIRequestDTO.getYourMessage());
+            message.setContent(messageAPIRequestDTO.getMessage());
             message.setFromUserId(authFromUser);
             message.setToUserId(toUser);
             messageService.save(message);

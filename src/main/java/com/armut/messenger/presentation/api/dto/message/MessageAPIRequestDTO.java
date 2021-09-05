@@ -8,11 +8,11 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class MessageAPIRequestDTO {
 
-    @NotEmpty(message = "toUsername field is mandatory.")
-    @JsonProperty(value = "toUsername")
-    private String toUsername;
+    @NotEmpty(message = "Username field is mandatory.")
+    @JsonProperty(value = "username")
+    private String username;
 
     @NotEmpty(message = "Message field is mandatory.")
-    @JsonProperty(value = "yourMessage")
-    private String yourMessage;
+    @JsonProperty(value = "message")
+    private String message;
 }
