@@ -18,7 +18,7 @@ docker-compose up
 * [Message Services](#message-services)
   * [Send Message](#1-send-message)
   * [Get Messaging User List](#2-get-messaging-user-list)
-  * [Get Messages Between Two Users](#3-get-messages-between-two-user)
+  * [Get Messages Between Two Users](#3-get-messages-between-two-users)
 
 * [Blocking Service](#blocking-service)
   * [Block User](#1-block-user)
