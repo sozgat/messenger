@@ -16,12 +16,12 @@ docker-compose up
   * [Login](#3-login)
   
 * [Message Services](#message-services)
-  * [Send Message](#send-message)
-  * [Get Messaging User List](#get-messaging-user-list)
-  * [Get Messages Between Two Users](#get-messages-between-two-user)
+  * [Send Message](#1-send-message)
+  * [Get Messaging User List](#2-get-messaging-user-list)
+  * [Get Messages Between Two Users](#3-get-messages-between-two-user)
 
 * [Blocking Service](#blocking-service)
-  * [Block User](#block-user)
+  * [Block User](#1-block-user)
 
 ## User Services
 User information management and check user info 
